@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine 💙</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;height:100vh;overflow:hidden;
+    font-family:system-ui,Segoe UI,Arial;
+    background:radial-gradient(circle at top,#1cb5e0,#000046);
+    color:#fff;display:flex;align-items:center;justify-content:center
+  }
+  .card{background:rgba(0,0,0,.65);border-radius:20px;padding:22px;width:92%;max-width:420px;text-align:center;box-shadow:0 0 30px rgba(0,150,255,.6)}
+  h1,h2{margin:.4em 0}
+  button{border:0;border-radius:999px;padding:12px 18px;margin:8px;font-size:1rem;cursor:pointer}
+  .primary{background:#00c6ff;color:#002233}
+  .outline{background:transparent;border:2px solid #00c6ff;color:#00c6ff}
+  .hidden{display:none}
+  .hearts span{position:absolute;font-size:22px;animation:floatUp 4s linear infinite}
+  @keyframes floatUp{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-100vh);opacity:0}}
+  .tap-heart{position:absolute;font-size:30px;animation:pop .6s ease forwards}
+  @keyframes pop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1.3);opacity:1}}
+  .photo{
+    width:100%;border-radius:16px;margin:10px 0 6px;
+    box-shadow:0 0 18px rgba(0,150,255,.7);border:2px solid rgba(0,198,255,.7)
+  }
+  .btn-row{position:relative;height:70px}
+  #noBtn{position:absolute;right:20px}
+  #typeQuestion{opacity:0;transition:.6s ease;text-shadow:0 0 10px rgba(0,198,255,.6)}
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+</audio>
+
+<div class="card" id="startScreen">
+  <h1>Hey Big Boy 💙</h1>
+  <p>Tap to start something special…</p>
+  <button class="primary" id="startBtn">Tap to Start Music 🎵</button>
+</div>
+
+<div class="card hidden" id="gameScreen">
+  <h1>Mini Game 💙</h1>
+  <p>Tap 5 hearts to unlock the question!</p>
+  <p><strong>Hearts tapped: <span id="count">0</span>/5</strong></p>
+</div>
+
+<div class="card hidden" id="mainScreen">
+  <h1>Kesley Cedeno 💙</h1>
+  <h2 id="typeLine"></h2>
+  <p id="typeQuestion">Will you be my Valentine? 💙</p>
+  <div class="btn-row">
+    <button class="primary" id="yesBtn">YES 💙</button>
+    <button class="outline" id="noBtn">No 😐</button>
+  </div>
+</div>
+
+<div class="card hidden" id="finalScreen">
+  <img class="photo" src="photo.jpg" alt="Us 💙"/>
+  <h1>Congrats, Big Boy 😏💙</h1>
+  <p>You’re stuck being my Valentine now.</p>
+  <p>Get ready for kisses, random hugs, and me being a little annoying on purpose.</p>
+  <p>I like you… a lot 🫶</p>
+  <button class="primary" onclick="window.open('https://www.youtube.com/watch?v=y7tHZ3WeJAw&list=RDy7tHZ3WeJAw&start_radio=1','_blank')">Tap song 🎧</button>
+</div>
+
+<div class="hearts" id="hearts"></div>
+
+<script>
+  const music=document.getElementById("bgMusic");
+  const startBtn=document.getElementById("startBtn");
+  const startScreen=document.getElementById("startScreen");
+  const gameScreen=document.getElementById("gameScreen");
+  const mainScreen=document.getElementById("mainScreen");
+  const finalScreen=document.getElementById("finalScreen");
+  const hearts=document.getElementById("hearts");
+  const noBtn=document.getElementById("noBtn");
+  const yesBtn=document.getElementById("yesBtn");
+  const countEl=document.getElementById("count");
+
+  let count=0;
+
+  startBtn.onclick=()=>{ music.play(); startScreen.classList.add("hidden"); gameScreen.classList.remove("hidden"); };
+
+  document.body.addEventListener("click",(e)=>{
+    if(!gameScreen.classList.contains("hidden")){
+      const h=document.createElement("div");
+      h.className="tap-heart"; h.textContent="💙";
+      h.style.left=e.clientX+"px"; h.style.top=e.clientY+"px";
+      document.body.appendChild(h); setTimeout(()=>h.remove(),600);
+      count++; countEl.textContent=count;
+      if(count>=5){ gameScreen.classList.add("hidden"); mainScreen.classList.remove("hidden"); }
+    }
+  });
+
+  noBtn.addEventListener("mouseover",()=>{
+    noBtn.style.left=Math.random()*200+"px";
+    noBtn.style.top=Math.random()*40+"px";
+  });
+
+  yesBtn.onclick=()=>{ mainScreen.classList.add("hidden"); finalScreen.classList.remove("hidden"); };
+
+  function floatHearts(){
+    const s=document.createElement("span");
+    s.textContent="💙"; s.style.left=Math.random()*100+"vw"; s.style.bottom="0";
+    hearts.appendChild(s); setTimeout(()=>s.remove(),4000);
+  }
+  setInterval(floatHearts,700);
+
+  // Typewriter + glow
+  const lineText = "This might be simple, but it’s from my heart…";
+  const typeLine = document.getElementById("typeLine");
+  const typeQuestion = document.getElementById("typeQuestion");
+  let i = 0;
+  function typeEffect(){
+    if(i < lineText.length){
+      typeLine.textContent += lineText.charAt(i);
+      i++;
+      setTimeout(typeEffect, 50);
+    } else {
+      typeQuestion.style.opacity = 1;
+    }
+  }
+  const observer = new MutationObserver(() => {
+    if(!mainScreen.classList.contains("hidden")){
+      typeEffect();
+      observer.disconnect();
+    }
+  });
+  observer.observe(mainScreen, { attributes: true });
+</script>
+</body>
+</html>
