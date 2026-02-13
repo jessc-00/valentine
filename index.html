@@ -20,7 +20,10 @@ h1,h2{margin:.4em 0}
 button{border:0;border-radius:999px;padding:12px 18px;margin:8px;font-size:1rem;cursor:pointer}
 .primary{background:#00c6ff;color:#002233}
 .outline{background:transparent;border:2px solid #00c6ff;color:#00c6ff}
-.hidden{display:none}
+.stage{display:none}
+.stage.active{display:block}
+.progress{margin:15px auto;width:80%;height:6px;background:rgba(255,255,255,.2);border-radius:20px;overflow:hidden}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#6aa6ff,#b6d3ff);transition:width 1s ease}
 .hearts span{position:absolute;font-size:22px;animation:floatUp 4s linear infinite}
 @keyframes floatUp{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-100vh);opacity:0}}
 .tap-heart{position:absolute;font-size:30px;animation:pop .6s ease forwards}
@@ -37,20 +40,12 @@ button{border:0;border-radius:999px;padding:12px 18px;margin:8px;font-size:1rem;
 .btn-row{position:relative;height:70px}
 #noBtn{position:absolute;right:20px}
 #typeQuestion{opacity:0;transition:.6s ease;text-shadow:0 0 10px rgba(0,198,255,.6)}
-.stage{display:none}
-.stage.active{display:block}
-.progress{margin:15px auto;width:80%;height:6px;background:rgba(255,255,255,.2);border-radius:20px;overflow:hidden}
-.bar{height:100%;width:0;background:linear-gradient(90deg,#6aa6ff,#b6d3ff);transition:width 1s ease}
-
-/* Confetti */
 .confetti{position:absolute;font-size:18px;animation:fall 2.5s linear forwards}
 @keyframes fall{to{transform:translateY(100vh) rotate(360deg);opacity:0}}
-
-/* Easter egg note */
 .note{
   position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
   background:rgba(0,0,0,.8);padding:12px 16px;border-radius:14px;
-  box-shadow:0 0 20px rgba(0,150,255,.7);display:none
+  box-shadow:0 0 20px rgba(0,150,255,.7);display:none;max-width:90%
 }
 </style>
 </head>
@@ -59,30 +54,43 @@ button{border:0;border-radius:999px;padding:12px 18px;margin:8px;font-size:1rem;
 <audio id="bgMusic" loop>
   <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
 </audio>
+<audio id="sparkleSound" preload="auto">
+  <source src="https://www.soundjay.com/misc/sounds/magic-chime-01.mp3" type="audio/mpeg">
+</audio>
 
-<div class="card stage active" id="stage1">
+<div class="card stage active" id="s1">
   <h1>Hey Big Boy 💙</h1>
-  <p>Tap to start something special…</p>
-  <button class="primary" onclick="startFlow()">Tap to Start Music 🎵</button>
+  <p>Ready for a tiny adventure?</p>
+  <button class="primary" onclick="start()">Tap to Begin 🎵</button>
   <div class="progress"><div class="bar" id="bar"></div></div>
 </div>
 
-<div class="card stage" id="stage2">
+<div class="card stage" id="s2">
   <h1>Warm-up 💙</h1>
-  <p>Tap 7 hearts to continue</p>
-  <p><strong><span id="count">0</span>/7</strong></p>
-  <div class="progress"><div class="bar"></div></div>
+  <p>Tap 10 hearts to continue</p>
+  <p><strong><span id="count">0</span>/10</strong></p>
 </div>
 
-<div class="card stage" id="stage3">
-  <h1>Pause with me…</h1>
-  <p>Close your eyes for 5 seconds 😌</p>
-  <button class="primary" onclick="countdown()">Start 5s</button>
-  <h3 id="countText"></h3>
-  <div class="progress"><div class="bar"></div></div>
+<div class="card stage" id="s3">
+  <h1>Choose your path 😏</h1>
+  <button class="outline" onclick="next(4,30)">Soft route 💫</button>
+  <button class="outline" onclick="next(4,30)">Playful route 🎮</button>
 </div>
 
-<div class="card stage" id="mainScreen">
+<div class="card stage" id="s4">
+  <h1>Slow it down…</h1>
+  <p>Hold your finger on the screen for 3 seconds</p>
+  <button class="primary" onmousedown="hold()" ontouchstart="hold()">Hold</button>
+  <h3 id="holdText"></h3>
+</div>
+
+<div class="card stage" id="s5">
+  <h1>Almost there 💙</h1>
+  <p>Swipe or tap to continue</p>
+  <button class="primary" onclick="next(6,55)">Continue ➜</button>
+</div>
+
+<div class="card stage" id="s6">
   <h1>Kesley Cedeno 💙</h1>
   <h2 id="typeLine"></h2>
   <p id="typeQuestion">Will you be my Valentine? 💙</p>
@@ -92,81 +100,71 @@ button{border:0;border-radius:999px;padding:12px 18px;margin:8px;font-size:1rem;
   </div>
 </div>
 
-<div class="card stage" id="finalScreen">
+<div class="card stage" id="s7">
   <img class="photo" src="photo.jpg" alt="Us 💙"/>
-  <h1>Congrats, Big Boy 😏💙</h1>
-  <p>I don’t need big words to say this…</p>
-  <p>I just really like being with you, laughing with you, and sharing moments with you.</p>
-  <p>So yeah… I’m choosing you 🫶</p>
+  <h1>Okay… one more question 😌</h1>
+  <p>Would you go on a date with me soon?</p>
+  <button class="primary" onclick="next(8,85); startWaitNote();">Of course 💙</button>
+</div>
+
+<div class="card stage" id="s8">
+  <h1>Last thing 💙</h1>
+  <p>I’ve got a song for you…</p>
   <button class="primary" onclick="window.open('https://www.youtube.com/results?search_query=dandelions+ruth+b','_blank')">Tap song 🎧</button>
 </div>
 
-<div class="card stage" id="dateScreen">
-  <h1>One more thing… 💙</h1>
-  <p>Let me take you out.</p>
-  <p>Dinner on me 🍽️ + a long walk after?</p>
-  <button class="primary" onclick="alert('It’s a date 😌💙')">Deal?</button>
-</div>
-
 <div class="hearts" id="hearts"></div>
-<div class="note" id="note">Psst… you found the secret note 💙 I’m really glad it’s you.</div>
+<div class="note" id="note">Secret note: I’m really happy it’s you 💙</div>
+<div class="note" id="waitNote">
+  If you’re still here, it means more to me than you know — and you passed the patience test 😌  
+  This took forever to make… but every hour was worth it for you, my love 💙
+</div>
 
 <script>
 const music=document.getElementById("bgMusic");
-const stages=document.querySelectorAll(".stage");
+const sparkle=document.getElementById("sparkleSound");
+const stages=[...document.querySelectorAll(".stage")];
+const bar=document.getElementById("bar");
 const hearts=document.getElementById("hearts");
 const noBtn=document.getElementById("noBtn");
 const yesBtn=document.getElementById("yesBtn");
 const countEl=document.getElementById("count");
-const bar=document.getElementById("bar");
 const note=document.getElementById("note");
+const waitNote=document.getElementById("waitNote");
+let count=0, egg=0;
 
-let count=0, eggTaps=0;
-
-function startFlow(){
-  music.play();
-  goStage(2,25);
-}
+function start(){ music.play(); next(2,15); }
 
 document.body.addEventListener("click",(e)=>{
-  if(document.getElementById("stage2").classList.contains("active")){
+  if(document.getElementById("s2").classList.contains("active")){
     const h=document.createElement("div");
     h.className="tap-heart"; h.textContent="💙";
     h.style.left=e.clientX+"px"; h.style.top=e.clientY+"px";
     document.body.appendChild(h); setTimeout(()=>h.remove(),600);
     count++; countEl.textContent=count;
-    if(count>=7) goStage(3,50);
+    if(count>=10) next(3,25);
   }
 });
 
-function countdown(){
-  let i=5;
-  const t=document.getElementById("countText");
+function hold(){
+  let t=3; const el=document.getElementById("holdText");
   const timer=setInterval(()=>{
-    t.textContent=i+"...";
-    i--;
-    if(i<0){ clearInterval(timer); goStage(4,75); startType(); }
+    el.textContent="Holding… "+t;
+    t--;
+    if(t<0){ clearInterval(timer); next(5,40); startType(); }
   },1000);
 }
 
-function goStage(n,progress){
+function next(n,p){
   stages.forEach(s=>s.classList.remove("active"));
-  stages[n-1].classList.add("active");
-  bar.style.width=progress+"%";
+  document.getElementById("s"+n).classList.add("active");
+  bar.style.width=p+"%";
 }
 
-noBtn.addEventListener("mouseover",()=>{
-  noBtn.style.left=Math.random()*200+"px";
-  noBtn.style.top=Math.random()*40+"px";
-});
+noBtn.onmouseover=()=>{ noBtn.style.left=Math.random()*200+"px"; noBtn.style.top=Math.random()*40+"px"; };
+yesBtn.onclick=()=>{ confetti(); next(7,70); };
 
-yesBtn.onclick=()=>{
-  goStage(5,90);
-  confettiBurst();
-  setTimeout(()=>goStage(6,100), 3500); // date reveal after a moment
-};
-
-function confettiBurst(){
+function confetti(){
   for(let i=0;i<60;i++){
     const c=document.createElement("div");
     c.className="confetti";
@@ -178,34 +176,44 @@ function confettiBurst(){
   }
 }
 
-// Easter egg: tap floating hearts 5 times
-hearts.addEventListener("click", ()=>{
-  eggTaps++;
-  if(eggTaps>=5){
-    note.style.display="block";
-    setTimeout(()=>note.style.display="none", 4000);
-    eggTaps=0;
-  }
-});
-
 function floatHearts(){
   const s=document.createElement("span");
   s.textContent="💙"; s.style.left=Math.random()*100+"vw"; s.style.bottom="0";
   hearts.appendChild(s); setTimeout(()=>s.remove(),4000);
 }
-setInterval(floatHearts,700);
+setInterval(floatHearts,800);
 
-// Typewriter
+hearts.onclick=()=>{
+  egg++;
+  if(egg>=5){
+    note.style.display="block";
+    sparkle.play();
+    setTimeout(()=>note.style.display="none",4000);
+    egg=0;
+  }
+};
+
 const lineText="This might be simple, but it’s from my heart…";
 const typeLine=document.getElementById("typeLine");
 const typeQuestion=document.getElementById("typeQuestion");
-let i=0;
 function startType(){
+  let j=0; typeLine.textContent=""; typeQuestion.style.opacity=0;
   const t=setInterval(()=>{
-    typeLine.textContent+=lineText.charAt(i);
-    i++;
-    if(i>=lineText.length){ clearInterval(t); typeQuestion.style.opacity=1; }
+    typeLine.textContent+=lineText.charAt(j);
+    j++;
+    if(j>=lineText.length){ clearInterval(t); typeQuestion.style.opacity=1; }
   },50);
+}
+
+// Hidden wait message on final screen (10s) + sparkle sound
+let waitTimer=null;
+function startWaitNote(){
+  clearTimeout(waitTimer);
+  waitTimer=setTimeout(()=>{
+    waitNote.style.display="block";
+    sparkle.play();
+    setTimeout(()=>waitNote.style.display="none",5000);
+  },10000);
 }
 </script>
 </body>
